@@ -34,18 +34,17 @@ def generate_video(input_path, prefix, char_id=0, image_synthesis=['normal'], fr
     if output_path is None:
         output_path = input_path
 
-    vid_folder = '{}/{}/{}/'.format(input_path, prefix, char_id)
+    vid_folder = os.path.join(input_path, prefix, str(char_id))
     if not os.path.isdir(vid_folder):
         print("The input path: {} you specified does not exist.".format(input_path))
     else:
+        ffmpeg_path = r'C:\ffmpeg\bin\ffmpeg.exe'
         for vid_mod in image_synthesis:
-            command_set = ['ffmpeg', '-i',
-                             '{}/Action_%04d_0_{}.png'.format(vid_folder, vid_mod), 
-                             '-framerate', str(frame_rate),
-                             '-pix_fmt', 'yuv420p',
-                             '{}/video_{}.mp4'.format(output_path, vid_mod)]
+            input_pattern = os.path.join(vid_folder, 'Action_%04d_0_{}.png'.format(vid_mod))
+            output_file = os.path.join(output_path, 'video_{}.mp4'.format(vid_mod))
+            command_set = [ffmpeg_path, '-i', input_pattern, '-framerate', str(frame_rate), '-pix_fmt', 'yuv420p', output_file]
             subprocess.call(command_set)
-            print("Video generated at ", '{}/video_{}.mp4'.format(output_path, vid_mod))
+            print("Video generated at", output_file)
 
 def read_pose_file(file_name, prefix):
     with open('{}/pd_{}.txt'.format(file_name, prefix), 'r') as f:
